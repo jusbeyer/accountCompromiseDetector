@@ -239,6 +239,8 @@ def main():
                     outFile.close()
             else:
                 print "Compromised Users: " + str(compromised_users)
+        else:
+            print "No compromised accounts were found."
     else:
         exit()
 
