@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='accountCompromiseTester',
+    name='accountCompromiseDetector',
     version='1.0',
-    packages=['accountCompromiseTester'],
+    packages=['accountCompromiseDetector'],
     url='',
     license='',
     author='Justin Beyer',
