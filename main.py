@@ -1,4 +1,10 @@
-import re, ldap, ConfigParser
+import ConfigParser
+import ldap
+import re
+import keyring
+
+# Set the keyring name
+keyring_name = 'accountCompromiseTester_Keyring'
 
 # Build Config Parser for script
 config = ConfigParser.SafeConfigParser()
@@ -27,14 +33,17 @@ baseDN = ''
 
 
 def build_config():
-
     try:
         with open('config.ini', 'w') as cfgFile:
             config.add_section('LDAP')
             config.set('LDAP', 'Server', raw_input("Enter the LDAP Server URL: "))
             config.set('LDAP', 'BaseDN', raw_input("Enter the LDAP Server Base DN: "))
-            config.set('LDAP', 'BindUsername', raw_input("Enter the LDAP Server Bind Account Username: "))
-            config.set('LDAP', 'BindPassword', raw_input("Enter the LDAP Server Bind Account Password: "))
+            cfgUsername = raw_input("Please enter the LDAP Bind Username: ")
+            config.set('LDAP', 'BindUsername', cfgUsername)
+            cfgPassword = raw_input("Please enter the LDAP Bind Password: ")
+            keyring.set_password(keyring_name, cfgUsername, cfgPassword)
+            cfgPassword = None
+            cfgUsername = None
             config.add_section('Password-Policy')
             config.set('Password-Policy', 'Min-Length', raw_input("Enter the Minimum Password Length for the Domain: "))
             config.set('Password-Policy', 'Complexity-Req',
@@ -48,7 +57,6 @@ def build_config():
                                  "(This is part of most password complexity requirements and requires LDAP Access) "))
             config.set('Script-Config', 'CheckLdap',
                        raw_input("Would you like to verify if usernames and passwords given are correct? "))
-
             if config.getboolean("Script-Config", "ReadFile"):
                 config.add_section("File-Details")
                 config.set('File-Details', 'InputFile',
@@ -62,6 +70,9 @@ def build_config():
             return True
     except IOError:
         print "Could not write config file"
+        return False
+    except Exception, e:
+        print "Exception Occurred while creating the config file: " + str(e)
         return False
 
 
@@ -105,7 +116,7 @@ def check_config():
             ldapServer = "ldap://" + str(ldapServer)
             baseDN = config.get("LDAP", "BaseDN")
             ldapUsername = config.get("LDAP", "BindUsername")
-            ldapPassword = config.get("LDAP", "BindPassword")
+            ldapPassword = keyring.get_password(keyring_name, ldapUsername)
 
             # Password Policy
             minLength = config.getint("Password-Policy", "Min-Length")

@@ -9,5 +9,5 @@ setup(
     author='Justin Beyer',
     author_email='jusbeyer@gmail.com',
     description='Tests Accounts for compromise',
-    install_requires = ['python-ldap']
+    install_requires=['python-ldap', 'keyring']
 )
