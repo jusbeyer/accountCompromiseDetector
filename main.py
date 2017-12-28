@@ -173,7 +173,7 @@ def check_password(username, password):
 
                     # check for samAccountName in password
                     if len(result_data["sAMAccountName"][0]) > 3:
-                        sam_pat = re.compile(result_data["sAMAccountName"][0], re.IGNORECASE)
+                        sam_pat = re.compile(re.escape(result_data["sAMAccountName"][0]), re.IGNORECASE)
                         if re.search(sam_pat, password):
                             return False
 
@@ -183,7 +183,7 @@ def check_password(username, password):
                         if len(token) < 3:
                             continue
                         else:
-                            display_pat = re.compile(token, re.IGNORECASE)
+                            display_pat = re.compile(re.escape(token), re.IGNORECASE)
                             if re.search(display_pat, password):
                                 return False
 
